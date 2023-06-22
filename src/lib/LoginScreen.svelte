@@ -1,14 +1,14 @@
 <script>
-  import { supabase } from ''; 
+  import { supabase } from '$lib/supabaseClient'; 
 
   let email = '';
   let password = '';
 
   async function logIn() {
-      const { error } = await supabase.auth.signIn({ email, password });
-      if (error) {
-          console.error('Error logging in:', error.message);
-      }
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password
+    })
   }
 </script>
 
