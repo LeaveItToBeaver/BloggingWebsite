@@ -10,6 +10,8 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"test:unit": "vitest",
+		"watch:tailwind": "postcss public/tailwind.css -o public/index.css -w",
+		"build:tailwind": "cross-env NODE_ENV=production postcss public/tailwind.css -o public/index.css",
 		"lint": "prettier --plugin-search-dir . --check .",
 		"format": "prettier --plugin-search-dir . --write ."
 	},

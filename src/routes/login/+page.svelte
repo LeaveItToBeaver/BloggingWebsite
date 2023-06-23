@@ -1,5 +1,5 @@
 <script>
-  import LoginScreen from '$lib/LoginScreen.svelte';
+  import LoginScreen from '$lib/views/LoginScreen.svelte';
 </script>
 
 <LoginScreen />
