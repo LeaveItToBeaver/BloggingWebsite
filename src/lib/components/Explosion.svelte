@@ -1,67 +1,93 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onDestroy } from 'svelte';
 
-  let particles = [];
+  type Particle = {
+    x: number;
+    y: number;
+    size: number;
+    speedX: number;
+    speedY: number;
+    color: string;
+  };
 
-  onMount(() => {
-    function createParticle(x, y, color) {
-      const particle = {
-        x,
-        y,
-        color,
-        size: Math.floor(Math.random() * 30 + 8),
-        destinationX: (Math.random() - 0.5) * 300,
-        destinationY: (Math.random() - 0.5) * 300,
-        rotation: Math.random() * 520,
-        delay: Math.random() * 200,
-        opacity: 1
-      };
+  let canvas: HTMLCanvasElement;
+  let ctx: CanvasRenderingContext2D;
+  let particles: Particle[] = [];
 
-      particles = [...particles, particle];
+  const colors = [
+    '#f94144',
+    '#f3722c',
+    '#f8961e',
+    '#f9844a',
+    '#f9c74f',
+    '#90be6d',
+    '#43aa8b',
+    '#577590',
+  ];
 
-      setTimeout(() => {
-        particle.opacity = 0;
-      }, 0);
+  let animationId: number;
 
-      setTimeout(() => {
-        particles = particles.filter(p => p !== particle);
-      }, 500 + particle.delay);
+  function canvasClick(e: MouseEvent) {
+    const size = Math.random() * 5 + 1;
+    const speed = Math.random() * 3 - 1.5; // a little bit of upward force
+    for (let i = 0; i < 30; i++) {
+      particles.push({
+        x: e.clientX,
+        y: e.clientY,
+        size,
+        speedX: Math.random() * speed,
+        speedY: Math.random() * speed,
+        color: colors[Math.floor(Math.random() * colors.length)],
+      });
     }
+  }
 
-    document.addEventListener('click', function (event) {
-      for (let i = 0; i < 30; i++) {
-        createParticle(event.clientX, event.clientY, getRandomColor());
+  function animateParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach((particle, i) => {
+      particle.x += particle.speedX;
+      particle.y += particle.speedY;
+      particle.size -= 0.05;
+
+      if (particle.size <= 0.1) {
+        particles.splice(i, 1);
+      } else {
+        ctx.fillStyle = particle.color;
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
       }
     });
+    animationId = requestAnimationFrame(animateParticles);
+  }
+
+  onDestroy(() => {
+    if (typeof cancelAnimationFrame !== "undefined") {
+      cancelAnimationFrame(animationId);
+    }
   });
 
-  function getRandomColor() {
-    const colors = ['#f94144', '#f3722c', '#f8961e', '#f9844a', '#f9c74f', '#90be6d', '#43aa8b', '#577590'];
-    return colors[Math.floor(Math.random() * colors.length)];
+  // This function runs once the div and canvas have been mounted to the DOM
+  function afterUpdate() {
+    ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+    animationId = requestAnimationFrame(animateParticles);
   }
 </script>
 
-<style>
-  .particle {
-    position: absolute;
-    border-radius: 50%;
-    transition: transform 500ms linear, opacity 500ms;
-  }
-</style>
+<div
+  on:click={canvasClick}
+  style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none;">
+  <canvas bind:this={canvas} style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" />
+</div>
 
-{#each particles as particle, i (particle.x + particle.y + i)}
-  <div
-    class="particle"
-    style="
-      background-color: {particle.color};
-      left: {particle.x - particle.size / 2}px;
-      top: {particle.y - particle.size / 2}px;
-      width: {particle.size}px;
-      height: {particle.size}px;
-      transform: translate({particle.destinationX}px, {particle.destinationY}px) rotate({particle.rotation}deg);
-      opacity: {particle.opacity};
-      transition-delay: {particle.delay}ms;
-    "
-    key={i}
-  ></div>
-{/each}
+<svelte:window on:resize={afterUpdate} on:load={afterUpdate} />

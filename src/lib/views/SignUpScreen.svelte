@@ -1,27 +1,71 @@
-<script>
-  import { supabase } from '$lib/supabaseClient'; 
-  import Textbox from '$lib/components/userlogin/TextBox.svelte';
-  import Button from '$lib/components/userlogin/Button.svelte';
+<script lang="ts">
+    import { supabase } from '$lib/supabaseClient'; 
+    import Textbox from '$lib/components/userlogin/TextBox.svelte';
+    import Button from '$lib/components/userlogin/Button.svelte';
+    import { writable } from 'svelte/store';
 
-  let email = '';
-  let password = '';
+    let validationError = writable('');
+    let email:string = '';
+    let password:string = '';
+    let secondPassword:string = '';
+    let formSubmitted:boolean = false;
 
-  async function signUp() {
-      const { data, error } = await supabase.auth.signUp({
-          email: email,
-          password: password
-      })
-  }
+    function isValidEmail(email: string) {
+        const regex = /^\S+@\S+\.\S+$/;
+        return regex.test(email);
+    }
+
+  
+    async function signUp() {
+        formSubmitted = true;
+
+        if (!isValidEmail){
+            validationError.set('Please enter a valid email.');
+            return;
+        }
+
+        if (password !== secondPassword) {
+            validationError.set('Passwords do not match');
+            return;
+        }
+
+        if(password.length < 6){
+            validationError.set('Password must be at least 6 characters');
+            return;
+        }
+
+        if (!/[A-Z]/.test(password) || !/\d/.test(password)) {
+            validationError.set('Password must contain at least one uppercase letter and one number');
+            return;
+        }
+
+        const { data, error } = await supabase.auth.signUp({
+            email: email,
+            password: password
+        });
+
+        if (error) {
+            validationError.set(error.message);
+            return;
+        }
+
+        formSubmitted = false;
+        validationError.set(''); 
+    }
 </script>
 
-<div class="flex flex-auto justify-center items-center">
-  <h1>Welcome!</h1>
-</div>
-
-<div class="flex w-full h-screen flex-auto justify-center items-center">
-    <div class="flex flex-col max-w-min justify-center items-center align-middle border-yellow-600 border-2">
-        <Textbox bind:value={email} placeholder="Email" />
-        <Textbox bind:value={password} placeholder="Password" password={true} />
-        <Button label="Sign Up!" on:click={signUp} />
+  
+<div class="flex w-full h-screen bg-transparent justify-center items-center text-white">
+    <div class="flex flex-col bg-white rounded-lg p-8 shadow-lg text-black max-w-lg mx-auto items-center">
+        <h2 class="text-2xl font-bold mb-6 text-center">Hey, Nice to meet you!</h2>
+        <Textbox bind:value={email} placeholder="Email" on:input={() => formSubmitted = false} />
+        <Textbox bind:value={password} placeholder="Password" password={true} 
+            cssClass={password !== secondPassword && password && secondPassword && formSubmitted ? 'passwordMismatch' : ''} 
+             />
+        <Textbox bind:value={secondPassword} placeholder="Confirm Password" password={true} 
+            cssClass={password !== secondPassword && password && secondPassword && formSubmitted ? 'passwordMismatch' : ''} 
+             />
+        <Button label="Sign Up" on:click={signUp} />
+        <p class="text-red-500">{$validationError}</p>
     </div>
 </div>
