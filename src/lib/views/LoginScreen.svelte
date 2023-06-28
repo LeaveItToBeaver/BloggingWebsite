@@ -33,31 +33,29 @@ function isValidEmail(email: string) {
         validationError.set('Password must contain at least one uppercase letter and one number');
         return;
     }
-      const { data, error } = await supabase.auth.signInWithPassword({
-          email: email,
-          password: password
-      });
+    
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: Password
+    });
+    
+    console.log("User Created At:", data.session?.user.confirmed_at);
+    console.log("%cUser Creation Error: " + error?.cause, 'color: red');
+      
+    if (error) {
+      validationError.set(error.message);
+      return;
+    }
+      
+    formSubmitted = false;
+    validationError.set(''); 
 
-      console.log("User Created At:", data.session?.user.confirmed_at);
-        console.log("%cUser Creation Error: " + error?.cause, 'color: red');
-
-        if (error) {
-            validationError.set(error.message);
-            return;
-        }
-
-        formSubmitted = false;
-        validationError.set(''); 
-
-        if (!error) {
-        formSubmitted = false;
-        validationError.set(''); 
-
-        if (data.user.confirmed_at) {
-            // After successful login, navigate to the user's page
-            // assuming userId is available in data.user.id
-            goto('/user/' + data.user.id);
-        };
+    if (!error) {
+      formSubmitted = false;
+      validationError.set('');
+      if (data.user.confirmed_at) {
+        goto('/user/' + );
+      };
     }
   }
 }
