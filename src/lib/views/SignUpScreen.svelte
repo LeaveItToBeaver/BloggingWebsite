@@ -1,7 +1,5 @@
 <script lang="ts">
 	import { supabase } from '$lib/supabaseClient';
-	import Textbox from '$lib/components/userlogin/AuthTextBox.svelte';
-	import Button from '$lib/components/userlogin/AuthButton.svelte';
 	import { writable } from 'svelte/store';
 
 	let validationError = writable('');
@@ -9,6 +7,8 @@
 	let password: string = '';
 	let secondPassword: string = '';
 	let formSubmitted: boolean = false;
+	let registrationSuccessful = writable(false);
+	let confirmationSent = writable(false);
 
 	function isValidEmail(email: string) {
 		const regex = /^\S+@\S+\.\S+$/;
@@ -43,42 +43,41 @@
 			password: password
 		});
 
-		console.log('User Created At:', data.session?.user.confirmed_at);
-		console.log('%cUser Creation Error: ' + error?.cause, 'color: red');
-
 		if (error) {
 			validationError.set(error.message);
 			return;
 		}
 
+		registrationSuccessful.set(true);
+		confirmationSent.set(true);
+
 		formSubmitted = false;
 		validationError.set('');
 	}
+
+
 </script>
 
 <div class="flex w-full h-screen bg-transparent justify-center items-center text-white">
-	<div
-		class="flex flex-col bg-white rounded-lg p-8 shadow-lg text-black max-w-lg mx-auto items-center"
-	>
-		<h2 class="text-2xl font-bold mb-6 text-center">Hey, Nice to meet you!</h2>
-		<Textbox bind:value={email} placeholder="Email" on:input={() => (formSubmitted = false)} />
-		<Textbox
-			bind:value={password}
-			placeholder="Password"
-			password={true}
-			cssClass={password !== secondPassword && password && secondPassword && formSubmitted
-				? 'passwordMismatch'
-				: ''}
-		/>
-		<Textbox
-			bind:value={secondPassword}
-			placeholder="Confirm Password"
-			password={true}
-			cssClass={password !== secondPassword && password && secondPassword && formSubmitted
-				? 'passwordMismatch'
-				: ''}
-		/>
-		<Button label="Sign Up" on:click={signUp} />
-		<p class="text-red-500">{$validationError}</p>
-	</div>
+    <div class="card w-auto h-auto bg-white rounded-lg p-8 shadow-lg text-black max-w-lg mx-auto">
+        <div class="card-body flex flex-col items-center">
+            <h2 class="text-2xl font-bold mb-6 text-center">Hey, Nice to meet you!</h2>
+            <input type="text" bind:value={email} placeholder="Email" class="input input-bordered input-primary w-full max-w-sm text-white" on:input={() => (formSubmitted = false)} />
+            <input type="password" bind:value={password} placeholder="Password" class="input input-bordered input-primary w-full max-w-sm text-white" />
+            <input type="password" bind:value={secondPassword} placeholder="Confirm Password" class="input input-bordered input-primary w-full max-w-sm text-white" />
+            <div class="h-4"></div> <!-- This is the spacer div -->
+            <button class="btn btn-outline btn-primary" on:click={signUp}>Sign up</button>
+            <p class="text-red-500">{$validationError}</p>
+
+            {#if $registrationSuccessful}
+                <div class="mt-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6 text-green-500">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <p class="ml-2">Registration successful! A confirmation email is on its way.</p>
+                </div>
+            {/if}
+
+        </div>
+    </div>
 </div>
