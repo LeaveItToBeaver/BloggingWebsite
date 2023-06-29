@@ -1,16 +1,3 @@
-<script lang="ts">
-	import { supabase } from "$lib/supabaseClient";
-
-    async function confirm() {
-        const { data, error } = await supabase
-  .from('Users')
-  .insert([
-    { some_column: 'someValue', other_column: 'otherValue' },
-  ])
-  .select()
-    }
-</script>
-
 <style>
   .checkmark-circle {
     width: 120px;
