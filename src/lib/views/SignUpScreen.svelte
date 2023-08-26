@@ -66,7 +66,10 @@
             <input type="password" bind:value={password} placeholder="Password" class="input input-bordered input-primary w-full max-w-sm text-white" />
             <input type="password" bind:value={secondPassword} placeholder="Confirm Password" class="input input-bordered input-primary w-full max-w-sm text-white" />
             <div class="h-4"></div> <!-- This is the spacer div -->
-            <button class="btn btn-outline btn-primary" on:click={signUp}>Sign up</button>
+			<div class="flex flex-row min-w-full justify-around">
+				<button class="btn btn-outline btn-primary" on:click={signUp}>Sign In</button>
+				<a href="/login" class="btn btn-outline btn-primary">Back</a>
+			</div>
             <p class="text-red-500">{$validationError}</p>
 
             {#if $registrationSuccessful}

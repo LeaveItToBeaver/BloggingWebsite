@@ -3,7 +3,6 @@
 	import { supabase } from '../lib/supabaseClient';
 	import { goto } from '$app/navigation';
     import { writable, type Writable } from 'svelte/store';
-    
 
     interface User {
 	    email?: string;
@@ -14,16 +13,37 @@
 export const user: Writable<User|null> = writable(null);
 
 	onMount(() => {
-		supabase.auth.onAuthStateChange(async (event, session) => {
-			console.log(`Supabase auth event: ${event}`);
-			if (event === 'SIGNED_IN' && session) {
-				if (session.user.email_confirmed_at) {
-					user.set(session.user);
-					goto('/signup');
-				}
-			}
-		});
-	});
+    // Check the current session directly
+    supabase.auth.getSession().then(sessionAccessor => {
+        const userData = sessionAccessor.data?.session?.user;
+        
+        if (userData && userData.email_confirmed_at) {
+            user.set(userData);
+            goto('/user/' + userData.id);
+        } else {
+            goto('/login');
+        }
+    })
+    .catch(error => {
+        console.error("Error getting session:", error);
+        goto('/login');
+    });
+
+    // Set event listener for future auth state changes
+    supabase.auth.onAuthStateChange(async (event, session) => {
+        console.log(`Supabase auth event: ${event}`);
+        if (event === 'SIGNED_IN' && session) {
+            if (session.user.email_confirmed_at) {
+                user.set(session.user);
+                goto('/user/' + session.user.id);
+            }
+        } else if (event === 'SIGNED_OUT') {
+            user.set(null);
+            goto('/login');
+        }
+    });
+});
+
 </script>
 
 {#if $user} 
