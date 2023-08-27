@@ -17,17 +17,31 @@
 			validationError.set(error.message);
 			return;
 		}
-		
+
 		if (data && data.user) {
-			goto('/user/' + data.user.id);
+			const { data: userProfile, error: userError} = await supabase
+			.from('User')
+			.select('id')
+			.eq('id', data.user.id)
+			.limit(1);
+
+			if(userError){
+				validationError.set(userError.message);
+				return;
+			}
+
+			if (userProfile && userProfile.length > 0) {
+				//go to users page
+			} else {
+				goto('/user-information');
+			}
 		}
 	}
 
 	async function resetPassword() {
-		goto('/resetpassword')
+		goto('/reset-password');
 	}
 </script>
-
 
 <div class="flex justify-center items-center h-screen bg-transparent">
 	<div class="card w-96 h-auto bg-white rounded-lg p-8 shadow-lg text-black max-w-lg mx-auto">
@@ -49,7 +63,7 @@
 
 			<div class="flex flex-row min-w-full justify-around">
 				<button class="btn btn-outline btn-primary" on:click={signIn}>Sign In</button>
-				<a href="/signup" class="btn btn-outline btn-primary">Sign Up</a>
+				<a href="/sign-up" class="btn btn-outline btn-primary">Sign Up</a>
 			</div>
 			<button class="btn btn-outline btn-warning" on:click={resetPassword}>Reset Password</button>
 			<p class="text-red-500">{$validationError}</p>

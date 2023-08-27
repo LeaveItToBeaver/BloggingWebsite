@@ -50,6 +50,6 @@ export const user: Writable<User|null> = writable(null);
 	<h2>Welcome back, {$user.email}</h2>
 	<p>Your email was confirmed at: {$user.confirmed_at}</p>
 {:else}
-	<h1>Welcome to SvelteKit</h1>
-	<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+	<h1>Welcome to The Blogging Website</h1>
+	<p>It seems there was an issue with your authentication. Please try again later.</p>
 {/if}
