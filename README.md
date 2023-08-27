@@ -1,12 +1,12 @@
-#My personal blogging website
+# My personal blogging website
 
-##Whenever I do something I do it big. 
+## Whenever I do something I do it big. 
 
 This is a full stack blogging website designed to encourage users to share and post to their hearts desire.
 
-##The Stack
+## The Stack
 
-###In this Stack we got:
+### In this Stack we got:
 
 1. SvelteKit: A lightweight framework which allows you to create reusable components that you can implement to hit the ground running and build something as quickly as possible. 
 
