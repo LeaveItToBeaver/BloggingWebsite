@@ -1,38 +1,17 @@
-# create-svelte
+# My personal blogging website
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+## Whenever I do something I do it big. 
 
-## Creating a project
+This is a full stack blogging website designed to encourage users to share and post to their hearts desire.
 
-If you're seeing this, you've probably already done this step. Congrats!
+## The Stack
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+### In this Stack we got:
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+1. SvelteKit: Designed to create reusable components that you can implement to hit the ground running and build something as quickly as possible. 
 
-## Developing
+2. TailWind.css: A robust CSS library that is designed to streamline the process of creating styles for your application.
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+3. SupaBase: An intuitive database clients managed with PostgreSQL.
 
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+Quill: An open source fancy text editor which can be utilized to design and create blogs. 
