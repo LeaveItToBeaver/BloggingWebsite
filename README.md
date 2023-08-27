@@ -14,4 +14,4 @@ This is a full stack blogging website designed to encourage users to share and p
 
 3. SupaBase: An intuitive database clients managed with PostgreSQL.
 
-Quill: An open source fancy text editor which can be utilized to design and create blogs. 
+4. Quill: An open source fancy text editor which can be utilized to design and create blogs. 
