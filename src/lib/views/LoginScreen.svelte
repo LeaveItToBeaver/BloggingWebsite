@@ -19,21 +19,33 @@
 		}
 
 		if (data && data.user) {
-			const { data: userProfile, error: userError} = await supabase
-			.from('User')
-			.select('id')
-			.eq('id', data.user.id)
-			.limit(1);
+			let { data: userProfile, error: userError } = await supabase
+				.from('Users')
+				.select('id, username, first_name, last_name')
+				.eq('id', data.user.id)
+				.single();
 
-			if(userError){
+			if (userError && userError.code == 'PGRST116') {
+				console.log('Error fetching user:', userError);
+				console.log('Inserting new user: ', data.user.id);
+				await supabase.from('Users').insert([{ id: data.user.id }]);
+				goto('/user-information');
+				return;
+			} else if (userError) {
+				console.log('Error fetching user:', userError);
 				validationError.set(userError.message);
 				return;
 			}
 
-			if (userProfile && userProfile.length > 0) {
-				//go to users page
-			} else {
+			// Check if essential fields are filled
+			if (
+				userProfile!.username == null ||
+				userProfile!.first_name == null ||
+				userProfile!.last_name == null
+			) {
 				goto('/user-information');
+			} else {
+				goto(`/${userProfile!.username}`);
 			}
 		}
 	}
@@ -46,7 +58,7 @@
 <div class="flex justify-center items-center h-screen bg-transparent">
 	<div class="card w-96 h-auto bg-white rounded-lg p-8 shadow-lg text-black max-w-lg mx-auto">
 		<div class="card-body flex flex-col items-center">
-			<h2 class="card-title text-3xl">Welcome back!</h2>
+			<h2 class="card-title text-3xl">Login</h2>
 			<input
 				bind:value={email}
 				type="text"

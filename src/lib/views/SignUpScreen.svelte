@@ -83,7 +83,7 @@
 			<!-- This is the spacer div -->
 			<div class="flex flex-row min-w-full justify-around">
 				<button class="btn btn-outline btn-primary" on:click={signUp}>Sign In</button>
-				<a href="/log-in" class="btn btn-outline btn-primary">Back</a>
+				<a href="/login" class="btn btn-outline btn-primary">Back</a>
 			</div>
 			<p class="text-red-500">{$validationError}</p>
 
