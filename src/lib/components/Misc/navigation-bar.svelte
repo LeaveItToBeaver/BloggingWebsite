@@ -2,9 +2,14 @@
 <script>
 	import { goto } from "$app/navigation";
     import { supabase } from "$lib/supabaseClient";
+	import account_circle from '../../icons/account_circle.svg';
+    import home_icon from '../../icons/home_icon.svg';
+    import logout_icon from '../../icons/logout.svg';
+    import settings_icon from '../../icons/settings.svg';
+
+
     let searchTerm = "";
-    // TODO: Import user's image, default to some placeholder for now
-    let userImage = "/path/to/user/image.png";
+	let userImage = account_circle;
     async function logout() {
         await supabase.auth.signOut();
         goto('/login');
@@ -15,7 +20,7 @@
     }
 </script>
 
-<div class="bg-gray-700 p-4 fixed w-full top-0 flex justify-center items-center">
+<div class="bg-gray-300 p-4 fixed w-full top-0 flex justify-center items-center">
     <!-- Search Bar -->
     <div class="flex-1 px-2">
         <input 
@@ -28,19 +33,20 @@
 
     <!-- User Image -->
     <div class="flex items-center space-x-4">
-        <img src={userImage} alt="User Image" class="h-10 w-10 rounded-full" />
 
+        <button class="btn btn-circle btn-ghost" >
+            <img srcset={account_circle} alt="User Image" class="h-10 w-10 rounded-full" />
+        </button>
         <!-- Home & Settings Icons -->
-        <!-- Note: You'll need some SVGs or icon fonts for these icons -->
-        <button class="btn btn-circle btn-ghost">
-            🏠 <!-- Replace with a home icon -->
+        <button class="btn btn-circle btn-ghost" >
+            <img srcset={home_icon} alt="Home Icon" class="h-10 w-10 rounded-full" />
         </button>
 
         <button class="btn btn-circle btn-ghost" on:click={settingsPage}>
-            ⚙️ <!-- Replace with a settings icon -->
+            <img srcset={settings_icon} alt="Home Icon" class="h-10 w-10 rounded-full" />
         </button>
         <button class="btn btn-circle btn-ghost" on:click={logout}>
-            Logout
+            <img srcset={logout_icon} alt="Home Icon" class="h-10 w-10 rounded-full" />
         </button>
     </div>
 </div>

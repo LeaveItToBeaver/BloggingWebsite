@@ -2,41 +2,51 @@
 	import { supabase } from '$lib/supabaseClient';
 	import { goto } from '$app/navigation';
 	import { writable } from 'svelte/store';
+	import account_circle from '../icons/account_circle.svg';
 
 	let validationError = writable('');
 	let fName = '';
 	let lName = '';
 	let enteredUserName = '';
+	let globalUserID = '';
 	let blogName = '';
-	let profileImageUrl = '/default/path/to/image.png'; // Default image
+	let profileImageUrl = account_circle; // Default image
 
-	async function isUsernameTaken(username: string) {
+	async function isUsernameTaken(username: string, currentUserID: string) {
 		const { data, error } = await supabase
 			.from('Users')
 			.select('username')
 			.eq('username', username)
 			.limit(1);
 
-		if (error) throw error;
-		return data && data.length > 0;
+		if(data && data.length > 0) {
+			const { data, error } = await supabase
+				.from('Users')
+				.select('username, id')
+				.eq('username', username)
+				.single();
+			if (error) throw error;
+			return data.id != currentUserID;
+		}
 	}
 
 	async function submitInfo() {
 		try {
 			const currentUser = supabase.auth.getUser();
+			const userID = (await currentUser).data.user?.id;
+			userID == null ? null : globalUserID = userID;
+			const userNameExists = await isUsernameTaken(enteredUserName, globalUserID);
+
 			if (!currentUser) {
 				validationError.set('User is not authenticated. Check your email.');
 				return;
 			}
 
-			const userID = (await currentUser).data.user?.id;
-			const userNameExists = await isUsernameTaken(enteredUserName);
-
 			if (userNameExists) {
 				validationError.set('Username already exsists.');
 				return;
 			}
-
+		
 			const { data: existingProfile, error: profileError } = await supabase
 				.from('Users')
 				.select('id')
@@ -51,6 +61,7 @@
 				 + lName
 				 + " and username to: " 
 				 + enteredUserName)
+
 				const { data, error } = await supabase
 					.from('Users')
 					.update({
@@ -60,10 +71,12 @@
 					})
 					.eq('id', userID)
 					.select('id');
+
 				console.log('Data Updated successfully: ', data);
 				if (error) {
 					console.log('Error updating data: ', error);
 				}
+
 				goto(`/${enteredUserName}`);
 			} else {
 				const { data, error } = await supabase
@@ -77,8 +90,10 @@
 						}
 					])
 					.select();
+
 				console.log('Data Inserted successfully: ', data);
 				goto(`/${enteredUserName}`);
+
 				if (error) {
 					console.log('Error updating data: ', error);
 				}
@@ -112,10 +127,15 @@
 	async function uploadImage(event: Event) {
 		const inputElement = event.target as HTMLInputElement;
 		const file = inputElement.files?.[0];
-		if (!file) return;
+		const currentUser = supabase.auth.getUser();
+		const userID = (await currentUser).data.user?.id;
 
-		const filePath = `profile_images/${file.name}`;
-		let { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file);
+		if (!file) return;
+		const filePath = `${userID}/profile_images/${file.name}`;
+		let { error: uploadError } = await supabase
+			.storage
+			.from('avatars')
+			.upload(filePath, file);
 
 		if (uploadError) {
 			console.error(uploadError);
@@ -132,11 +152,10 @@
 		<div class="card-body flex flex-col items-center">
 			<div class="mb-4">
 				<label for="file">
-					<!-- svelte-ignore a11y-img-redundant-alt -->
 					<img
-						src={profileImageUrl}
+						srcset={account_circle}
 						alt="User's profile picture"
-						class="h-32 w-32 rounded-full cursor-pointer"
+						class="h-32 ounded-full cursor-pointer"
 					/>
 				</label>
 				<input id="file" type="file" class="hidden" on:change={uploadImage} />
