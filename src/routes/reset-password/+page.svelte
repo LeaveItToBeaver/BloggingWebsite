@@ -17,7 +17,7 @@
 		}
 
 		const { error } = await supabase.auth.resetPasswordForEmail(email, {
-			redirectTo: 'http://localhost:3000/update-password'
+			redirectTo: 'http://localhost:3000/update-password' //For testing purposes.
 		});
 
 		if (error) {
