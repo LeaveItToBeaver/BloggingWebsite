@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { writable } from 'svelte/store';
 	import account_circle from '../icons/account_circle.svg';
+	import ImageUploader from '$lib/components/misc/ImageUploader.svelte';
 
 	let validationError = writable('');
 	let fName = '';
@@ -10,7 +11,14 @@
 	let enteredUserName = '';
 	let globalUserID = '';
 	let blogName = '';
-	let profileImageUrl = account_circle; // Default image
+	let bio = '';
+	let profile_image_url = account_circle; // Default image
+
+	let showUploader = writable(false);
+
+	function openUploader() {
+		showUploader.set(true);
+	}
 
 	async function isUsernameTaken(username: string, currentUserID: string) {
 		const { data, error } = await supabase
@@ -19,7 +27,7 @@
 			.eq('username', username)
 			.limit(1);
 
-		if(data && data.length > 0) {
+		if (data && data.length > 0) {
 			const { data, error } = await supabase
 				.from('Users')
 				.select('username, id')
@@ -34,7 +42,7 @@
 		try {
 			const currentUser = supabase.auth.getUser();
 			const userID = (await currentUser).data.user?.id;
-			userID == null ? null : globalUserID = userID;
+			userID == null ? null : (globalUserID = userID);
 			const userNameExists = await isUsernameTaken(enteredUserName, globalUserID);
 
 			if (!currentUser) {
@@ -46,7 +54,7 @@
 				validationError.set('Username already exsists.');
 				return;
 			}
-		
+
 			const { data: existingProfile, error: profileError } = await supabase
 				.from('Users')
 				.select('id')
@@ -55,19 +63,24 @@
 
 			if (profileError) throw profileError;
 			if (existingProfile && existingProfile.length > 0) {
-				console.log("Updating first name to " 
-				 + fName 
-				 + ", last name to " 
-				 + lName
-				 + " and username to: " 
-				 + enteredUserName)
+				console.log(
+					'Updating first name to ' +
+						fName +
+						', last name to ' +
+						lName +
+						' and username to: ' +
+						enteredUserName
+				);
 
 				const { data, error } = await supabase
 					.from('Users')
 					.update({
+						id: userID,
 						username: enteredUserName,
 						first_name: fName,
-						last_name: lName
+						last_name: lName,
+						blog_name: blogName,
+						bio: bio
 					})
 					.eq('id', userID)
 					.select('id');
@@ -86,7 +99,9 @@
 							id: userID,
 							username: enteredUserName,
 							first_name: fName,
-							last_name: lName
+							last_name: lName,
+							blog_name: blogName,
+							bio: bio
 						}
 					])
 					.select();
@@ -108,7 +123,7 @@
 		const userID = (await currentUser).data.user?.id;
 		const { data, error } = await supabase
 			.from('Users')
-			.select('username, first_name, last_name, profile_image_url, blog_name')
+			.select('username, first_name, last_name, profile_image_url, blog_name, bio')
 			.eq('id', userID)
 			.single();
 
@@ -116,33 +131,38 @@
 			enteredUserName = data.username;
 			fName = data.first_name;
 			lName = data.last_name;
-			profileImageUrl = data.profile_image_url;
+			profile_image_url = data.profile_image_url
+				? supabase.storage.from('avatars').getPublicUrl(data.profile_image_url).data.publicUrl
+				: account_circle;
 			blogName = data.blog_name;
+			bio = data.bio;
 		}
+
 		if (error) {
 			console.log(error.message);
 		}
 	}
 
-	async function uploadImage(event: Event) {
-		const inputElement = event.target as HTMLInputElement;
-		const file = inputElement.files?.[0];
-		const currentUser = supabase.auth.getUser();
-		const userID = (await currentUser).data.user?.id;
+	// async function uploadImage(event: Event) {
+	// 	const inputElement = event.target as HTMLInputElement;
+	// 	const file = inputElement.files?.[0];
+	// 	const currentUser = supabase.auth.getUser();
+	// 	const userID = (await currentUser).data.user?.id;
 
-		if (!file) return;
-		const filePath = `${userID}/profile_images/${file.name}`;
-		let { error: uploadError } = await supabase
-			.storage
-			.from('avatars')
-			.upload(filePath, file);
+	// 	if (!file) return;
+	// 	const filePath = `${userID}/profile_images/${file.name}`;
+	// 	let { error: uploadError } = await supabase
+	// 		.storage
+	// 		.from('avatars')
+	// 		.upload(filePath, file);
 
-		if (uploadError) {
-			console.error(uploadError);
-		} else {
-			profileImageUrl = filePath; // Update the URL in your state
-		}
-	}
+	// 	if (uploadError) {
+	// 		console.error(uploadError);
+	// 	} else {
+	// 		const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
+	// 		profile_image_url = data.publicUrl; 
+	// 	}
+	// }
 
 	loadUserInfo();
 </script>
@@ -150,15 +170,19 @@
 <div class="flex justify-center items-center h-screen bg-transparent">
 	<div class="card w-96 h-auto bg-white rounded-lg p-8 shadow-lg text-black max-w-lg mx-auto">
 		<div class="card-body flex flex-col items-center">
+			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<div class="mb-4">
-				<label for="file">
-					<img
-						srcset={account_circle}
-						alt="User's profile picture"
-						class="h-32 ounded-full cursor-pointer"
-					/>
-				</label>
-				<input id="file" type="file" class="hidden" on:change={uploadImage} />
+				<!-- svelte-ignore a11y-img-redundant-alt -->
+				<img
+					src={profile_image_url}
+					alt="User's profile picture"
+					class="profile-picture h-32 rounded-full cursor-pointer"
+					on:click={openUploader}
+				/>
+		
+				{#if $showUploader}
+					<ImageUploader bind:profileImageUrl={profile_image_url} on:close={() => showUploader.set(false)} />
+				{/if}
 			</div>
 			<h2 class="card-title text-3xl">Welcome back!</h2>
 			<input
@@ -177,6 +201,19 @@
 				bind:value={enteredUserName}
 				type="text"
 				placeholder="Enter Username"
+				class="input input-bordered input-primary w-full max-w-sm text-white"
+			/>
+			<input
+				bind:value={blogName}
+				type="text"
+				placeholder="Enter Name of Blog"
+				class="input input-bordered input-primary w-full max-w-sm text-white"
+			/>
+			<textarea
+				bind:value={bio}
+				rows="5"
+				cols="80"
+				placeholder="Enter bio..."
 				class="input input-bordered input-primary w-full max-w-sm text-white"
 			/>
 			<div class="h-4" />

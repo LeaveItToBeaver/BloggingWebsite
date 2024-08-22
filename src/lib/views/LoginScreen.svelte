@@ -2,6 +2,7 @@
 	import { supabase } from '$lib/supabaseClient';
 	import { goto } from '$app/navigation';
 	import { writable } from 'svelte/store';
+	import { userStore } from '$lib/stores/UserStore';
 
 	let validationError = writable('');
 	let email: string = '';
@@ -19,6 +20,7 @@
 		}
 
 		if (data && data.user) {
+			userStore.setUser(data.user);
 			let { data: userProfile, error: userError } = await supabase
 				.from('Users')
 				.select('id, username, first_name, last_name')

@@ -9,6 +9,9 @@ const config = {
 	server: {
 		port: 3000,
 	},
+	build: {
+	  sourcemap: true, // Enable sourcemaps
+	},
 };
 
 export default config;
