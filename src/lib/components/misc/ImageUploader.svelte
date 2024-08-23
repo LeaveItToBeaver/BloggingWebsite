@@ -101,15 +101,15 @@
 }
 </script>
 
-<div>
+<div class="flex flex-col items-center">
 	<input type="file" accept="image/*" on:change={uploadImage} />
 
 	{#if imageUrl}
-		<div>
+		<div class="items-center">
 			<!-- svelte-ignore a11y-img-redundant-alt -->
 			<img id="image" src={imageUrl} alt="Selected image for cropping" />
 		</div>
-		<button on:click={cropAndUploadImage}>Crop & Upload</button>
+		<button on:click={cropAndUploadImage} class="btn btn-outline btn-primary">Crop & Upload</button>
 	{/if}
 </div>
 

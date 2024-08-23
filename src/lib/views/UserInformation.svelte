@@ -4,6 +4,7 @@
 	import { writable } from 'svelte/store';
 	import account_circle from '../icons/account_circle.svg';
 	import ImageUploader from '$lib/components/misc/ImageUploader.svelte';
+	import { userStore } from '$lib/stores/UserStore';
 
 	let validationError = writable('');
 	let fName = '';
@@ -12,7 +13,8 @@
 	let globalUserID = '';
 	let blogName = '';
 	let bio = '';
-	let profile_image_url = account_circle; // Default image
+	let profile_image_url: string | undefined; // Default image
+    $: user = $userStore;
 
 	let showUploader = writable(false);
 
@@ -118,6 +120,7 @@
 			validationError.set('An error occurred. Please try in a little bit.');
 		}
 	}
+
 	async function loadUserInfo() {
 		const currentUser = supabase.auth.getUser();
 		const userID = (await currentUser).data.user?.id;
@@ -131,9 +134,7 @@
 			enteredUserName = data.username;
 			fName = data.first_name;
 			lName = data.last_name;
-			profile_image_url = data.profile_image_url
-				? supabase.storage.from('avatars').getPublicUrl(data.profile_image_url).data.publicUrl
-				: account_circle;
+			profile_image_url = user?.image?.url;
 			blogName = data.blog_name;
 			bio = data.bio;
 		}
@@ -142,27 +143,6 @@
 			console.log(error.message);
 		}
 	}
-
-	// async function uploadImage(event: Event) {
-	// 	const inputElement = event.target as HTMLInputElement;
-	// 	const file = inputElement.files?.[0];
-	// 	const currentUser = supabase.auth.getUser();
-	// 	const userID = (await currentUser).data.user?.id;
-
-	// 	if (!file) return;
-	// 	const filePath = `${userID}/profile_images/${file.name}`;
-	// 	let { error: uploadError } = await supabase
-	// 		.storage
-	// 		.from('avatars')
-	// 		.upload(filePath, file);
-
-	// 	if (uploadError) {
-	// 		console.error(uploadError);
-	// 	} else {
-	// 		const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
-	// 		profile_image_url = data.publicUrl; 
-	// 	}
-	// }
 
 	loadUserInfo();
 </script>
