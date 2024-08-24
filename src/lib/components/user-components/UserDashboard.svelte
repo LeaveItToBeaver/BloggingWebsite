@@ -79,9 +79,8 @@
 		</div>
 		<div class="flex flex-col justify-center w-3/4 h-full py-3 px-2">
 			<div
-				class=" flex flex-row bg-slate-50 rounded-lg justify-center text-center py-1 drop-shadow-xl min-w-max"
-			>
-				<h3 class="text-black text-xl font-semibold mb-2 text-center">{blogName}</h3>
+				class="flex flex-row bg-slate-50 rounded-lg justify-center text-center py-1 drop-shadow-xl min-w-max">
+				<h3 class="text-black text-xl font-semibold m-2 text-center">{blogName}</h3>
 			</div>
 
 			<div class="bio text-sm text-center">
