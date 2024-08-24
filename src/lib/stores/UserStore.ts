@@ -9,6 +9,7 @@ type UserImage = {
 
 type ExtendedUser = User & {
     image?: UserImage | null;
+    userName?: string | null;
 };
 
 type UserStore = {
@@ -56,7 +57,7 @@ function createUserStore(): UserStore {
                 // Fetch additional user details like profile image URL
                 const { data: userData, error } = await supabase
                     .from('Users')
-                    .select('profile_image_url')
+                    .select('profile_image_url, username')
                     .eq('id', user.id)
                     .single();
         
@@ -65,6 +66,7 @@ function createUserStore(): UserStore {
                 } else {
                     if (userData && userData.profile_image_url) {
                         let profileImageUrl = userData.profile_image_url;
+                        let username = userData.username;
         
                         if (!profileImageUrl.startsWith('http')) {
                             // If it's not a full URL, generate it using Supabase's storage URL generator
@@ -79,6 +81,8 @@ function createUserStore(): UserStore {
                             url: profileImageUrl,
                             alt: 'User Profile Image',
                         };
+
+                        user.userName = username;
                     }
                 }
         

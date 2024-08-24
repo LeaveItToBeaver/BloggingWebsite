@@ -12,6 +12,7 @@
     let searchTerm = "";
     let userImage = account_circle;
     let user;
+    let username: string | null | undefined;
 
     // Update the user when the store changes
     $: user = $userStore;
@@ -26,11 +27,16 @@
         goto('/user-information');
     }
 
+    function homePage(){
+        goto(`/${username}`);
+    };
+
     onMount(async () => {
         await userStore.checkSession();
 
         if (user && user.image) {
             userImage = user.image.url;
+            username = user.userName;
             console.log('User Image URL in NavBar: ', userImage);
         } else {
             userImage = account_circle;
@@ -54,7 +60,7 @@
 
     <!-- User Image -->
     <div class="flex items-center space-x-4">
-        <button class="btn btn-circle btn-ghost">
+        <button class="btn btn-circle btn-ghost" on:click={homePage}>
             <img srcset={userImage} alt="User Image" class="h-9 w-9 rounded-full" />
         </button>
 

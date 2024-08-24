@@ -60,7 +60,7 @@
 	});
 </script>
 
-<div class="flex flex-col items-center h-screen">
+<div class="flex flex-col items-center">
 	<div
 		class="card bg-white w-4/5 max-w-2xl mx-auto my-4 flex flex-row items-center"
 		style="height: fit-content; max-height: 50%"
