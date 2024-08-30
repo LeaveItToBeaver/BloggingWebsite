@@ -7,7 +7,7 @@
     import account_circle from '../../icons/account_circle.svg';
     import home_icon from '../../icons/home_icon.svg';
     import logout_icon from '../../icons/logout.svg';
-    import settings_icon from '../../icons/settings.svg';
+    import settings_icon from '../../icons/settings.svg'
 
     let searchTerm = "";
     let userImage = account_circle;
