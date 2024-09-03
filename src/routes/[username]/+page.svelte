@@ -5,10 +5,11 @@
 	import { onMount } from 'svelte';
 	import { supabase } from '$lib/supabaseClient';
 	import { userStore } from '$lib/stores/UserStore';
-    import { v4 as uuid4 } from 'uuid'
+	import { v4 as uuid4 } from 'uuid';
 
 	let editor: DocumentEditor;
 	let viewDocumentEditor = false;
+	let enteredtitle = '';
 
 	$: user = $userStore;
 
@@ -17,10 +18,12 @@
 	}
 
 	async function saveContent() {
+		//enteredtitle == null ? 'Default Title' : enteredtitle;
+
 		if (editor) {
 			try {
 				const content = editor.getContent();
-				const uuid = uuid4(); 
+				const uuid = uuid4();
 				const currentTimestamp = new Date().toISOString();
 
 				const contentObject = {
@@ -34,7 +37,7 @@
 							id: uuid,
 							created_at: currentTimestamp,
 							user_id: user?.id,
-							title: 'Default Post Title',
+							title: enteredtitle,
 							content: contentObject
 						}
 					])
@@ -73,6 +76,12 @@
 
 {#if viewDocumentEditor}
 	<div id="editor">
+		<input
+			bind:value={enteredtitle}
+			type="text"
+			placeholder="Enter a Title"
+			class="input input-bordered input-secondary w-full"
+		/>
 		<DocumentEditor bind:this={editor} />
 		<button on:click={saveContent}>Save Content</button>
 	</div>

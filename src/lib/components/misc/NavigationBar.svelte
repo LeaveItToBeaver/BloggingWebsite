@@ -61,6 +61,7 @@
     <!-- User Image -->
     <div class="flex items-center space-x-4">
         <button class="btn btn-circle btn-ghost" on:click={homePage}>
+            <!-- svelte-ignore a11y-img-redundant-alt -->
             <img srcset={userImage} alt="User Image" class="h-9 w-9 rounded-full" />
         </button>
 

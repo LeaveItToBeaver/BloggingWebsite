@@ -153,6 +153,7 @@
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
 			<div class="mb-4">
 				<!-- svelte-ignore a11y-img-redundant-alt -->
+				<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 				<img
 					src={profile_image_url}
 					alt="User's profile picture"
