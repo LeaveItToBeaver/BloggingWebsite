@@ -8,6 +8,7 @@
 	export let userName: string;
 
 	let sanitizedContent: string;
+	let formattedDate: string;
 
 	function sanitizeContent() {
 		if (typeof post.content === 'object' && 'html' in post.content) {
@@ -17,8 +18,17 @@
 		}
 	}
 
+	function formatDate() {
+		const date = new Date(post.created_at);
+		formattedDate = new Intl.DateTimeFormat('en-US', {
+			dateStyle: 'medium',
+			timeStyle: 'short',
+		}).format(date);
+	}
+
 	onMount(() => {
 		sanitizeContent();
+		formatDate();
 	});
 </script>
 
@@ -28,7 +38,7 @@
 			{post.title}
 		</h2>
 		<h2 class="text-1xl">
-			{post.created_at}
+			{formattedDate}
 		</h2>
 	</div>
 	<div class="text-black post-content w-full mb-4">

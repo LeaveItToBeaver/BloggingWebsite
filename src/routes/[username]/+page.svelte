@@ -18,6 +18,11 @@
 	let isLoading = true;
 
 	async function loadUserInfo() {
+		try {
+
+		} catch (loadUserError) {
+			console.log("An unexpected error occured while loading the user information:", loadUserError)
+		}
 		loggedInUserId = await getLoggedInUserId();
 		const userInfo = await fetchUserInfo(username);
 		if (userInfo) {
