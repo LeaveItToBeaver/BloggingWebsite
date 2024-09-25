@@ -6,6 +6,7 @@
 	export let selectedUserId: string;
 	export let userImage: string;
 	export let userName: string;
+	export let likedPosts: string[];
 
 	let posts: Post[] = [];
 
@@ -33,7 +34,7 @@
 
 <div class="post-list">
 	{#each posts as post (post.id)}
-		<BlogPostComponent {post} {userImage} {userName} />
+		<BlogPostComponent {post} {userImage} {userName} {likedPosts} />
 	{/each}
 </div>
 

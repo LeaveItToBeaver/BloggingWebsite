@@ -1,5 +1,8 @@
 import { writable, type Writable } from 'svelte/store';
 import { supabase } from '$lib/supabaseClient';
+import type { RealtimePostgresInsertPayload } from '@supabase/supabase-js';
+import { userStore } from './UserStore';
+import { userRepository } from '$lib/repository/UserRepository';
 
 export interface Post {
 	id: string;
@@ -20,6 +23,7 @@ interface PostStore {
 	updatePost: (updatedPost: Post) => void;
 	deletePost: (postId: string) => void;
 	likePost: (postId: string) => void;
+	unlikePost: (postId: string) => void
 	clearPosts: () => void;
 }
 
@@ -55,6 +59,16 @@ function createPostStore(): PostStore {
 				posts.map((post) => {
 					if (post.id === postId) {
 						return { ...post, likes: post.likes + 1 };
+					}
+					return post;
+				})
+			);
+		},
+		unlikePost: (postId: string) => {
+			update((posts) =>
+				posts.map((post) => {
+					if (post.id === postId) {
+						return { ...post, likes: post.likes - 1 };
 					}
 					return post;
 				})

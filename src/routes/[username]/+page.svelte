@@ -16,6 +16,7 @@
 	let isCurrentUser = false;
 	let selectedUserId: string | undefined = undefined;
 	let isLoading = true;
+	let likedPosts: string[];
 
 	async function loadUserInfo() {
 		try {
@@ -46,7 +47,7 @@
 {#if !isLoading && selectedUserId}
 	<UserDashboard {profileImageUrl} {fName} {lName} {blogName} {bio} />
 	<DocumentEditorWrapper {isCurrentUser} {selectedUserId} />
-	<BlogPostListViewer {selectedUserId} userImage={profileImageUrl} userName={`${fName} ${lName}`} />
+	<BlogPostListViewer {selectedUserId} userImage={profileImageUrl} userName={`${fName} ${lName}`} likedPosts={likedPosts} />
 {:else}
 	<p>Loading user information...</p>
 {/if}
