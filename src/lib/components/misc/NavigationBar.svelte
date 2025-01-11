@@ -1,49 +1,45 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
+    import { onMount, afterUpdate } from 'svelte';
     import { supabase } from "$lib/supabaseClient";
     import { goto } from "$app/navigation";
     import { userStore } from '../../stores/UserStore';
-
     import account_circle from '../../icons/account_circle.svg';
     import home_icon from '../../icons/home_icon.svg';
     import logout_icon from '../../icons/logout.svg';
     import settings_icon from '../../icons/settings.svg';
-
+    
     let searchTerm = "";
-    let userImage = account_circle;
     let user;
+    let userImage = account_circle;
     let username: string | null | undefined;
-
-    // Update the user when the store changes
-    $: user = $userStore;
+    
+    // Update user data whenever the store changes
+    $: {
+        if ($userStore) {
+            username = $userStore.userName;
+            userImage = $userStore.image?.url || account_circle;
+        } else {
+            userImage = account_circle;
+            username = undefined;
+        }
+    }
 
     async function logout() {
         await supabase.auth.signOut();
-        userStore.setUser(null);
+        userStore.clearUser();
         goto('/login');
     }
 
-    function settingsPage(){
+    function settingsPage() {
         goto('/user-information');
     }
 
-    function homePage(){
+    function homePage() {
         goto(`/${username}`);
-    };
+    }
 
     onMount(async () => {
         await userStore.checkSession();
-
-        if (user && user.image) {
-            userImage = user.image.url;
-            username = user.userName;
-            console.log('User Image URL in Navbar: ', userImage);
-        } else {
-            userImage = account_circle;
-        }
-
-        console.log("User:", user?.id);
-        console.log("Current user in navbar:", user?.id);
     });
 </script>
 
@@ -71,7 +67,7 @@
         </button>
 
         <!-- Conditionally render the Settings and Logout icons -->
-        {#if user}
+        {#if $userStore}
             <button class="btn btn-circle btn-ghost" on:click={settingsPage}>
                 <img srcset={settings_icon} alt="Settings Icon" class="h-9 w-9 rounded-full" />
             </button>

@@ -9,46 +9,41 @@
 	let password: string = '';
 
 	async function signIn() {
-		const { data, error } = await supabase.auth.signInWithPassword({
-			email: email,
-			password: password
-		});
+		try {
+			const { data, error } = await supabase.auth.signInWithPassword({
+				email: email,
+				password: password
+			});
 
-		if (error) {
-			validationError.set(error.message);
-			return;
-		}
-
-		if (data && data.user) {
-			userStore.setUser(data.user);
-			let { data: userProfile, error: userError } = await supabase
-				.from('Users')
-				.select('id, username, first_name, last_name')
-				.eq('id', data.user.id)
-				.single();
-
-			if (userError && userError.code == 'PGRST116') {
-				console.log('Error fetching user:', userError);
-				console.log('Inserting new user: ', data.user.id);
-				await supabase.from('Users').insert([{ id: data.user.id }]);
-				goto('/user-information');
-				return;
-			} else if (userError) {
-				console.log('Error fetching user:', userError);
-				validationError.set(userError.message);
+			if (error) {
+				validationError.set(error.message);
 				return;
 			}
 
-			// Check if essential fields are filled
-			if (
-				userProfile!.username == null ||
-				userProfile!.first_name == null ||
-				userProfile!.last_name == null
-			) {
-				goto('/user-information');
-			} else {
-				goto(`/${userProfile!.username}`);
+			if (data && data.user) {
+				await userStore.setUser(data.user); // This will also fetch the profile image
+
+				let { data: userProfile, error: userError } = await supabase
+					.from('Users')
+					.select('id, username, first_name, last_name')
+					.eq('id', data.user.id)
+					.single();
+
+				if (userError && userError.code == 'PGRST116') {
+					await supabase.from('Users').insert([{ id: data.user.id }]);
+					goto('/user-information');
+					return;
+				}
+
+				if (!userProfile?.username || !userProfile?.first_name || !userProfile?.last_name) {
+					goto('/user-information');
+				} else {
+					goto(`/${userProfile.username}`);
+				}
 			}
+		} catch (error) {
+			console.error('Sign in error:', error);
+			validationError.set('An unexpected error occurred');
 		}
 	}
 

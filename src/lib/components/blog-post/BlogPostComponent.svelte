@@ -76,13 +76,14 @@
 				><img
 					src={favorite_icon_filled}
 					alt="Like Post"
-					class="w-5 h-5 rounded-full mr-2"
+					class="w-5 h-5 rounded-full ml-2 mr-2"
 				/></button
 			>
+		{:else}
+			<button on:click={favoritePost}
+				><img src={favorite_icon} alt="Like Post" class="w-5 h-5 rounded-full ml-2 mr-2" /></button
+			>
 		{/if}
-		<button on:click={favoritePost}
-			><img src={favorite_icon} alt="Like Post" class="w-5 h-5 rounded-full ml-2 mr-2" /></button
-		>
 		<h3 class="text-black text-lg font-semibold">Likes: {totalLikes || '0'}</h3>
 	</div>
 </div>
