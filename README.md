@@ -1,8 +1,6 @@
 # My Personal Blogging Website
 
-## Philosophy
-
-In everything I undertake, I aim for grandeur and significance. My blogging website embodies this principle by offering a platform that not only enables, but encourages users to express themselves freely and share content that resonates with them and their audience. Due to its size and scope, I am still actively working on this project and will most likely continue to do so long after it is completed.
+I am still actively working on this project and will most likely continue to do so long after it is completed.
 
 ## The Technology Stack
 
